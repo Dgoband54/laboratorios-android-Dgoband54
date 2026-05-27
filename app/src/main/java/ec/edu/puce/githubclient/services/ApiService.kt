@@ -5,12 +5,12 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface ApiService {
-    @GET(value = "/user/repos")
+    @GET("/user/repos")
     suspend fun getRepositories(
-        @Query( value = "sort") created : String = "created",
-        @Query( value = "direction") direction : String = "desc",
-        @Query( value= "affiliation") affiliation : String = "owner",
-        @Query( value = "per_page") perPage: Int = 100,
-        @Query( value= "*") t: String = "$(Systen.currentTimeMillis())",
-    ) :  List<Repository>
+        @Query("sort") created: String = "created",
+        @Query("direction") direction: String = "desc",
+        @Query("affiliation") affiliation: String = "owner",
+        @Query("per_page") perPage: Int = 100,
+        @Query("_") timestamp: Long = System.currentTimeMillis()
+    ): List<Repository>
 }

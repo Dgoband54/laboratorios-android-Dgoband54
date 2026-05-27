@@ -30,6 +30,7 @@ class RepoListViewModel : ViewModel() {
             _errorMsg.value = null
 
             try {
+                // Dentro de RepoListViewModel.kt
                 _repos.value = RetrofitClient.apiService.getRepositories()
             } catch (e: Exception) {
                 _errorMsg.value =

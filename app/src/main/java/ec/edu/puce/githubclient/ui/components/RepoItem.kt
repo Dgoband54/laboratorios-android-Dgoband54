@@ -1,5 +1,7 @@
 package ec.edu.puce.githubclient.ui.components
 
+import android.R
+import android.accessibilityservice.GestureDescription
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,55 +20,57 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import ec.edu.puce.githubclient.models.GithubUser
+import ec.edu.puce.githubclient.models.Repository
+import java.net.URL
+
 
 @Composable
-fun RepoItem(
-    name: String,
-    description: String,
-    avatarUrl: String,
-    language: String?
+fun RepoItem (
+    repository: Repository
 ) {
-    Card(
+    Card (
         modifier = Modifier
             .fillMaxWidth()
-            .padding(all = 8.dp)
-    ) {
-        Row(
+            .padding(8.dp)
+    ){
+        Row (
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(all = 16.dp)
-        ) {
+                .padding(16.dp)
+        ){
             AsyncImage(
-                model = avatarUrl,
-                contentDescription = "Imagen de repositorio",
-                modifier = Modifier.size(size = 60.dp),
+                model = repository.owner.avatarUrl,
+                contentDescription = "imagen de ${repository.name}",
+                modifier = Modifier.size(60.dp),
                 contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.width(width = 16.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
             Column {
                 Text(
-                    text = name,
+                    text = repository.name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
 
-                if (!description.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(height = 4.dp))
+                Spacer(modifier = Modifier.height(4.dp))
+
+                if (!repository.description.isNullOrBlank()) {
                     Text(
-                        text = description,
-                        style = MaterialTheme.typography.bodySmall
+                        text = repository.description,
+                        style = MaterialTheme.typography.bodySmall,
                     )
                 }
 
-                if (!language.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(height = 4.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (!repository.language.isNullOrBlank()) {
                     Text(
-                        text = language,
+                        text = repository.language,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
                     )
                 }
             }
@@ -74,15 +78,24 @@ fun RepoItem(
     }
 }
 
+
+
 @Preview(showBackground = true)
 @Composable
-fun RepoItemPreview() {
-    RepoItem(
+fun RepoItemPreview () {
+    val repository = Repository (
+        id="1234",
         name = "Repositorio de Android",
-        description = "repo creado con Kotlin para desarrollo movil",
-        avatarUrl = "https://example.com/avatar.png",
-        language = "Kotlin"
-    )
-}
+        description = "Repositorio de Andorid para Stefano",
+        language = "kOTLIN",
+        owner= GithubUser (
+            id = "123",
+            login = "Stefo14jc",
+            avatarUrl = "https://avatars.githubusercontent.com/u/216222495?v=4&size=64"
 
+        )
+    )
+
+    RepoItem(repository)
+}
 

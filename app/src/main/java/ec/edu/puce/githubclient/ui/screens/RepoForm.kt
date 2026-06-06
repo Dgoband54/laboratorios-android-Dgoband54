@@ -42,14 +42,20 @@ import ec.edu.puce.githubclient.viewmodels.RepoFormViewModel
 fun RepoForm(
     onBackClick: () -> Unit = {},
     onSaveSuccess: () -> Unit = {},
-    viewModel: RepoFormViewModel = viewModel()
+    viewModel: RepoFormViewModel = viewModel(),
+    // Parámetros para modo edición (null = modo creación)
+    editOwner: String? = null,
+    editRepoName: String? = null,
+    editInitialName: String? = null,
+    editInitialDescription: String? = null
 ) {
+    val isEditMode = editRepoName != null
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMsg by viewModel.error.collectAsState()
     val isSuccess by viewModel.isSuccess.collectAsState()
 
-    var name by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf(editInitialName ?: "") }
+    var description by remember { mutableStateOf(editInitialDescription ?: "") }
 
     LaunchedEffect(key1 = isSuccess) {
         if (isSuccess) {
@@ -61,7 +67,7 @@ fun RepoForm(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Crear Repositorio") },
+                title = { Text(text = if (isEditMode) "Editar Repositorio" else "Crear Repositorio") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
@@ -97,8 +103,6 @@ fun RepoForm(
                 )
             }
 
-            // SE ELIMINÓ LA LLAVE EXTRA QUE CERRABA LA COLUMNA AQUÍ ABAJO
-
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -116,7 +120,13 @@ fun RepoForm(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = { viewModel.createRepo(name, description) },
+                onClick = {
+                    if (isEditMode) {
+                        viewModel.updateRepo(editOwner!!, editRepoName!!, name, description)
+                    } else {
+                        viewModel.createRepo(name, description)
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
@@ -124,7 +134,7 @@ fun RepoForm(
                     contentDescription = "Guardar"
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                Text(text = "Guardar")
+                Text(text = if (isEditMode) "Actualizar" else "Guardar")
             }
         }
     }

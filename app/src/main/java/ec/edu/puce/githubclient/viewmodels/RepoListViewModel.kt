@@ -3,7 +3,7 @@ package ec.edu.puce.githubclient.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ec.edu.puce.githubclient.models.Repository
-// CORRECCIÓN: El nombre correcto es RetrofitClient
+import ec.edu.puce.githubclient.models.RepositoryPayload
 import ec.edu.puce.githubclient.services.RetrofitClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,6 +34,20 @@ class RepoListViewModel : ViewModel() {
             } catch (e: Exception) {
                 _error.value = e.localizedMessage ?: "Error al cargar repositorios"
             } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun deleteRepo(owner: String, repoName: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+            try {
+                RetrofitClient.apiService.deleteRepository(owner, repoName)
+                fetchRepos()
+            } catch (e: Exception) {
+                _error.value = e.localizedMessage ?: "Error al eliminar el repositorio"
                 _isLoading.value = false
             }
         }

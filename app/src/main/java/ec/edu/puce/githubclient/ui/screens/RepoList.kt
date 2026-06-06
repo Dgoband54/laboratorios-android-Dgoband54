@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ec.edu.puce.githubclient.models.Repository
 import ec.edu.puce.githubclient.ui.components.RepoItem
 import ec.edu.puce.githubclient.ui.theme.GithubClientTheme
 import ec.edu.puce.githubclient.viewmodels.RepoListViewModel
@@ -29,7 +30,8 @@ import ec.edu.puce.githubclient.viewmodels.RepoListViewModel
 fun RepoList(
     modifier: Modifier = Modifier,
     viewModel: RepoListViewModel = viewModel(),
-    onNavigatetoForm: () -> Unit = {}
+    onNavigatetoForm: () -> Unit = {},
+    onNavigateToEdit: (Repository) -> Unit = {}
 ) {
     val repos by viewModel.repos.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -74,7 +76,11 @@ fun RepoList(
                             name = repo.name,
                             description = repo.description ?: "Sin descripción",
                             avatarUrl = repo.owner.avatarUrl,
-                            language = repo.language ?: "Desconocido"
+                            language = repo.language ?: "Desconocido",
+                            onEditClick = { onNavigateToEdit(repo) },
+                            onDeleteClick = {
+                                viewModel.deleteRepo(repo.owner.login, repo.name)
+                            }
                         )
                     }
                 }

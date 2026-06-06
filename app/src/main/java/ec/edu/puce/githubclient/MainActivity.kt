@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ec.edu.puce.githubclient.models.Repository
 import ec.edu.puce.githubclient.ui.screens.RepoForm
 import ec.edu.puce.githubclient.ui.screens.RepoList
 import ec.edu.puce.githubclient.ui.theme.GithubClientTheme
@@ -22,28 +23,39 @@ class MainActivity : ComponentActivity() {
         setContent {
             GithubClientTheme {
                 var currentScreen by remember { mutableStateOf("repoList") }
+                var repoToEdit by remember { mutableStateOf<Repository?>(null) }
                 val listViewModel: RepoListViewModel = viewModel()
-                val formViewModel: RepoFormViewModel = viewModel() // Espacio corregido aquí
+                val formViewModel: RepoFormViewModel = viewModel()
 
                 when (currentScreen) {
                     "repoList" -> RepoList(
                         viewModel = listViewModel,
                         onNavigatetoForm = {
-                            formViewModel.resetError() // Limpia el error 422 antes de entrar al formulario
+                            repoToEdit = null
+                            formViewModel.resetError()
+                            currentScreen = "repoForm"
+                        },
+                        onNavigateToEdit = { repo ->
+                            repoToEdit = repo
+                            formViewModel.resetError()
                             currentScreen = "repoForm"
                         }
                     )
                     "repoForm" -> RepoForm(
-                        viewModel = formViewModel, // Ahora sí se vincula correctamente y deja de estar gris
+                        viewModel = formViewModel,
                         onBackClick = {
-                            formViewModel.resetError() // Limpia el error al regresar a la lista
+                            formViewModel.resetError()
                             currentScreen = "repoList"
                         },
                         onSaveSuccess = {
                             listViewModel.fetchRepos()
-                            formViewModel.resetError() // Limpia por seguridad tras un caso exitoso
+                            formViewModel.resetError()
                             currentScreen = "repoList"
-                        }
+                        },
+                        editOwner = repoToEdit?.owner?.login,
+                        editRepoName = repoToEdit?.name,
+                        editInitialName = repoToEdit?.name,
+                        editInitialDescription = repoToEdit?.description ?: ""
                     )
                 }
             }
